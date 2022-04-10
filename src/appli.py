@@ -1,12 +1,12 @@
 import tkinter
 
-from gui import TransGui
+from gui import TransNotbook
 
 
 
 if __name__ == "__main__":
     root = tkinter.Tk()
-    root.geometry("300x700")
-    root.wm_title("Arabic transliteration")
-    app = TransGui(root)
+    root.geometry("700x550")
+    root.wm_title("Transliteration")
+    app = TransNotbook(root)
     app.mainloop()
