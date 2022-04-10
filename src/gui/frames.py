@@ -123,7 +123,15 @@ class FileTransGui(FrameGui):
         """# Function for opening the
         # file explorer window
         # """
-        fname = tk.filedialog.askopenfilename(initialdir="/home",
+
+        pwd = os.path.dirname(os.path.abspath(__file__))
+
+
+        pwd = os.path.join(pwd,"..","data")
+
+        print('pwd:',pwd)
+
+        fname = tk.filedialog.askopenfilename(initialdir=pwd,
                                               title="Select a File",
                                               filetypes=(("Text files",
                                                           "*.txt*"),
