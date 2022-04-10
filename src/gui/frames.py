@@ -5,10 +5,9 @@ from trans_tools import arabic
 
 
 class TransGui(tk.Frame):
-    
+
     def __init__(self, master=None):
         self.input_text = u'السلام عليكم'
-        
 
         tk.Frame.__init__(self, master)
         self.pack()
@@ -16,72 +15,95 @@ class TransGui(tk.Frame):
 
     def createWidgets(self):
 
-
-        self.font = tkFont.Font(family="Arial", size=12)  
-
-        
+        self.font = tkFont.Font(family="Arial", size=12)
 
         self.addLabel("Texte :")
 
-        self.addTextInput(self.input_text)
+        self.addTextInput()
 
-        self.addButton("Transliterate",self.generate)
+        self.addButton("Transliterate", self.onButtonPress)
 
+        self.addTextOutput()
 
+    def addLabel(self, text, padx="15px"):
+        tk.Label(self, text=text).pack(padx=padx, fill='x')
 
-        self.textOutput = tk.Text(self)
-        self.textOutput.pack(fill="both", padx="5px", pady="5px")
-        self.textOutput.tag_config("hacker", foreground="green")
-        self.textOutput.tag_config("warning", foreground="red")
-
-    def addLabel(self, text,padx="15px"):
-        tk.Label(self, text=text).pack(padx=padx, fill='x')     
-
-    def addButton(self, titre,command, padx="10px", pady="5px"):
+    def addButton(self, titre, command, padx="10px", pady="5px"):
         self.genButton = tk.Button(self)
         self.genButton["text"] = titre
         self.genButton["command"] = command
         self.genButton.pack(padx=padx, pady=pady)
 
-    def addTextInput(self,text, height=115, padx="5px", pady="5px"):                
+    def addTextInput(self, text="", height=115, padx="5px", pady="5px"):
 
-        self.textInput = tk.Text(self,height=height,width=75,wrap=tk.WORD)
+        self.textEntry = tk.Entry(self, justify="right", width=50)
+        self.textName = tk.StringVar()
+        self.textName.set(render_bidi_text(text))
+        self.textEntry["textvariable"] = self.textName
 
-        scrollbar = tk.Scrollbar(self.textInput, command=self.textInput.yview)
+        #self.textEntry.place( x=padx, y=pady,width=250, height=250)
 
-        self.textInput.config(yscroll=scrollbar.set)
+        self.textEntry.pack(fill="both", padx=padx, pady=pady)
 
-        self.textInput.pack( fill="both",padx=padx, pady=pady)
-        #['yscrollcommand'] = scrollbar.set
+        add_bidi_support(self.textEntry)
 
-        #self.textInput.configure(font=self.font)
 
-        scrollbar.pack(fill=tk.Y,side="left")
+        #Execute event after pressed any key
+        self.textEntry.bind('<KeyRelease>',self.onKeyPress)
 
+    def addTextOutput(self, height=115, padx="5px", pady="5px"):
+
+        self.textOutput = tk.Text(self, wrap=tk.WORD)
+        self.textOutput.pack(fill="both", padx=padx, pady=pady)
+
+        #scrollbar = tk.Scrollbar(self.textInput, command=self.textInput.yview)
+
+        # self.textInput.config(yscroll=scrollbar.set)
+
+        #self.textInput.pack( fill="both",padx=padx, pady=pady)
+        # ['yscrollcommand'] = scrollbar.set
+
+        # self.textInput.configure(font=self.font)
+
+        # scrollbar.pack(fill=tk.Y,side="left")
+
+    def onKeyPress(self,event):
+        """Callback
+        """        
+        value = event.widget.get()        
         
-
-        self.textInput.tag_configure('tag-right', justify='right',rmargin=5)
-
-        self.textInput.delete('1.0','end')               
-
-        self.textInput.insert(tk.INSERT,render_bidi_text(text),'tag-right')
-
-
+        #print("value of %s is '%s'" % (event.widget._name, value))
         
+        self.textOutput.delete(1.0, "end")
+
+        output = self.transliterate(value)
         
-        add_bidi_support(self.textInput)
+        self.textOutput.insert(tk.INSERT, output)
 
- 
-    def generate(self):
+    def onButtonPress(self):
 
-        self.input_text = self.textInput.get('1.0','end')
+        self.input_text = self.textName.get()
 
-        print("self.input_text:", self.input_text)
+        #print("self.input_text:", self.input_text)
 
         self.textOutput.delete(1.0, "end")
 
-        output = arabic.transliterate(derender_bidi_text(self.input_text))
-        self.textOutput.insert("end", output, "hacker")
+        output = self.transliterate(derender_bidi_text(self.input_text))
+        self.textOutput.insert(tk.INSERT, output)
+
+    def transliterate(self,text):
+
+        #detect language
+        #TODO
+
+        lang = 'ara'
+
+        if lang == 'ara':
+            return arabic.transliterate(text)
+
+        return ""
+
+
 
 
 if __name__ == "__main__":
