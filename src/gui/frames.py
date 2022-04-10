@@ -151,9 +151,9 @@ class FileTransGui(FrameGui):
         
         self.textOutput.insert(tk.INSERT, output)
 
-    def openFile(self):
+    def openFile(self, encoding='utf8'):
 
-        with open(self.filename, 'r') as f:
+        with open(self.filename, 'r',encoding=encoding) as f:
             return f.read()
 
 
